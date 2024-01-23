@@ -1,0 +1,41 @@
+import requests
+
+# Replace these values with the target web application URL and parameters
+target_url = 'http://example.com/login'
+login_payload = {'username': 'admin', 'password': 'password'}
+
+def check_sql_injection(url, parameters):
+    for param in parameters:
+        test_payload = f"' OR '1'='1' --"
+        data = {param: test_payload}
+        response = requests.get(url, params=data)
+        if "error" in response.text.lower():
+            print(f"Potential SQL Injection vulnerability found in parameter: {param}")
+
+def check_xss(url, parameters):
+    for param in parameters:
+        test_payload = '<script>alert("XSS");</script>'
+        data = {param: test_payload}
+        response = requests.get(url, params=data)
+        if '<script>alert("XSS");</script>' in response.text:
+            print(f"Potential XSS vulnerability found in parameter: {param}")
+
+def check_csrf(url, parameters):
+    # For CSRF, a proper assessment would involve analyzing forms and tokens.
+    # This is a simplified example.
+    for param in parameters:
+        test_payload = 'malicious_csrf'
+        data = {param: test_payload}
+        response = requests.post(url, data=data)
+        if "csrf token is invalid" in response.text.lower():
+            print(f"Potential CSRF vulnerability found in parameter: {param}")
+
+if __name__ == '__main__':
+    # Check for SQL Injection
+    check_sql_injection(target_url, login_payload)
+
+    # Check for Cross-Site Scripting (XSS)
+    check_xss(target_url, login_payload)
+
+    # Check for Cross-Site Request Forgery (CSRF)
+    check_csrf(target_url, login_payload)
