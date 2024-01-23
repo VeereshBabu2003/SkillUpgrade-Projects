@@ -1,0 +1,28 @@
+import nmap
+
+def network_scan(target):
+    nm = nmap.PortScanner()
+
+    # Perform a basic scan of the target
+    nm.scan(target, arguments='-p 1-1000')
+
+    # Print scan results
+    for host in nm.all_hosts():
+        print('Host : %s (%s)' % (host, nm[host].hostname()))
+        print('State : %s' % nm[host].state())
+
+        for proto in nm[host].all_protocols():
+            print('----------')
+            print('Protocol : %s' % proto)
+
+            lport = list(nm[host][proto].keys())
+            lport.sort()
+
+            for port in lport:
+                print('Port : %s\tState : %s' % (port, nm[host][proto][port]['state']))
+
+                # You can add more detailed information or vulnerability checks here
+
+if __name__ == '__main__':
+    target_ip = '192.168.1.1'  # Replace with your target IP address or network range
+    network_scan(target_ip)
